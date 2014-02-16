@@ -41,24 +41,44 @@ function statusd {
 
 
 if [[ $USER = 'root' ]]; then
+	rootWarning=`who | grep $USER | wc -l`
+
+	if [[ $rootWarning -gt 0 ]]; then
+		bar "WARNING" 50
+			echo -e "\e[1;34m+ \e[1;31mSSH breech! $USER should not be able to login"
+			echo -e "\e[1;34m+ \e[1;31mRemote IP for $USER: \e[0;37m`who | grep pat | sed -r 's/[\ \t]+/\ /g' | cut -f5 -d' ' | sort | uniq | cut -f1 -d\. | sed -e 's/[()]//g' -e 's/-/\./g'`"
+
+	fi	
+
 	bar 'System Info' 50
 		echo -e "\e[1;34m+\e[0;36m IP Address \e[1;34m= \e[0;37m`ifconfig | grep -E 'inet ([0-9]{1,3}\.){3}[0-9]{1,3}' | grep -v '127.0.0.1' | sed 's/^\s*//' | cut -f2 -d" "`"
-		echo -e "\e[1;34m+\e[0;36m Uptime     \e[1;34m= \e[0;37m`uptime -p | sed 's/up\ //g'`"
-		echo -e "\e[1;34m+\e[0;36m User Count \e[1;34m= \e[0;37m`who | cut -f1 -d' ' | sort | uniq | wc -l`"
-	bar 'Daemons' 50
-		echo -e -n "\e[1;34m+\e[0;36m Apache  \e[1;34m= \e[0;37m"; statusd 'httpd'
-		echo -e -n "\e[1;34m+\e[0;36m Bind    \e[1;34m= \e[0;37m"; statusd 'named'
-		echo -e -n "\e[1;34m+\e[0;36m SSH     \e[1;34m= \e[0;37m"; statusd 'sshd'	
-		echo -e -n "\e[1;34m+\e[0;36m MariaDB \e[1;34m= \e[0;37m"; statusd 'mysqld'
+		echo -e "\e[1;34m+\e[0;36m Sys Uptime \e[1;34m= \e[0;37m`uptime -p | sed 's/up\ //g'`"
+		echo -e "\e[1;34m+\e[0;36m Last Login \e[1;34m= \e[0;37m`last | grep -v "still" | head -1 | sed -r 's/[\ \t]+/\ /g' | cut -f4,5,6,7 -d' '`"
+		echo -e "\e[1;34m+\e[0;36m User Load  \e[1;34m= \e[0;37m`who | cut -f1 -d' ' | sort | uniq | wc -l`"
+	bar 'Service Status' 50
+		echo -e -n "\e[1;34m+\e[0;36m httpd      \e[1;34m= \e[0;37m"; statusd 'httpd'
+		echo -e -n "\e[1;34m+\e[0;36m named      \e[1;34m= \e[0;37m"; statusd 'named'
+		echo -e -n "\e[1;34m+\e[0;36m sshd       \e[1;34m= \e[0;37m"; statusd 'sshd'	
+	bar 'Pending Tasks' 50
+		if [[ `wc -m < ~/.todo` -gt 1 ]]; then
+			while read line; do
+				if [[ ! $line =~ ^[\ \t]*$ ]]; then
+					echo -e "\e[1;34m+\e[0;37m $line"
+				fi
+			done < ~/.todo
+		else
+			echo -e "\e[1;34m+\e[0;37m No pending tasks"
+		fi
+			
 	bar '' 49
 
 else
 	bar 'System Info' 50
 		echo -e "\e[1;34m+\e[0;36m Hostname \e[1;34m  = \e[0;37m`hostname`"
 		echo -e "\e[1;34m+\e[0;36m IP Address \e[1;34m= \e[0;37m`ifconfig | grep -E 'inet ([0-9]{1,3}\.){3}[0-9]{1,3}' | grep -v '127.0.0.1' | sed 's/^\s*//' | cut -f2 -d" "`"
-		echo -e "\e[1;34m+\e[0;36m Uptime     \e[1;34m= \e[0;37m`uptime -p | sed 's/up\ //g'`"
+		echo -e "\e[1;34m+\e[0;36m Uptime     \e[1;34m= \e[0;37m`uptime -p | sed 's/up\ //g'`"	
+		echo -e "\e[1;34m+\e[0;36m Last Login\e[1;34m = \e[0;37m`last | grep -v "still" | head -1 | sed -r 's/[\ \t]+/\ /g' | cut -f4,5,6,7 -d' '`"
 		echo -e "\e[1;34m+\e[0;36m User Count \e[1;34m= \e[0;37m`who | cut -f1 -d' ' | sort | uniq | wc -l`"
-		echo -e "\e[1;34m+\e[0;36m Sessions \e[1;34m  = \e[0;37m`who | grep $USER | wc -l` (\e[1;37m`whoami`\e[0;37m)"
 	bar 'Pending Tasks' 50
 		if [[ `wc -m < ~/.todo` -gt 1 ]]; then
 			while read line; do
@@ -70,5 +90,6 @@ else
 			echo -e "\e[1;34m+\e[0;37m No pending tasks"
 		fi
 	bar '' 49
+	echo "\e[0m"
 
 fi
