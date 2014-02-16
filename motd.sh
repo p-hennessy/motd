@@ -74,6 +74,8 @@ if [[ $USER = 'root' ]]; then
 	httpdStatus=`statusd 'httpd'`
 	namedStatus=`statusd 'named'`
 	sshdStatus=`statusd 'sshd'`
+	fail2banStatus=`statusd 'fail2ban'`
+	sshguardStatus=`statusd 'sshguard'`
 
 	if [[ $rootWarning -gt 0 ]]; then
 		bar "WARNING" 50
@@ -87,10 +89,12 @@ if [[ $USER = 'root' ]]; then
 		printStat "Sys Uptime" "$serverUptime"
 		printStat "Last Login" "$userLastLogin"
 		printStat "User Load" "$serverUserLoad"
-	bar 'Service Status' 50
+	bar 'Daemon Status' 50
 		printStat "httpd" "$httpdStatus"
 		printStat "named" "$namedStatus"
 		printStat "sshd" "$sshdStatus"
+		printStat "f2b" "$fail2banStatus"
+		printStat "sshgd" "$sshguardStatus"
 	bar 'Pending Tasks' 50
 		if [[ `wc -m < ~/.todo` -gt 1 ]]; then
 			while read line; do
