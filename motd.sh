@@ -5,7 +5,6 @@
 # Date:   02/16/14	   #
 # ======================== #
 
-clear
 serverIP=`ifconfig | grep -E 'inet ([0-9]{1,3}\.){3}[0-9]{1,3}' | grep -v '127.0.0.1' | sed 's/^\s*//' | cut -f2 -d' '`
 serverHostname=`hostname`
 serverUptime=`uptime -p | sed 's/up\ //g'`
@@ -76,6 +75,7 @@ if [[ $USER = 'root' ]]; then
 	sshdStatus=`statusd 'sshd'`
 	fail2banStatus=`statusd 'fail2ban'`
 	sshguardStatus=`statusd 'sshguard'`
+	cronieStatus=`statusd 'cronie'`
 
 	if [[ $rootWarning -gt 0 ]]; then
 		bar "WARNING" 50
@@ -95,6 +95,7 @@ if [[ $USER = 'root' ]]; then
 		printStat "sshd" "$sshdStatus"
 		printStat "f2b" "$fail2banStatus"
 		printStat "sshgd" "$sshguardStatus"
+		printStat "cronie" "$cronieStatus"
 	bar 'Pending Tasks' 50
 		if [[ `wc -m < ~/.todo` -gt 1 ]]; then
 			while read line; do
