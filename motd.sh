@@ -76,6 +76,9 @@ if [[ $USER = 'root' ]]; then
 	fail2banStatus=`statusd 'fail2ban'`
 	sshguardStatus=`statusd 'sshguard'`
 	cronieStatus=`statusd 'cronie'`
+	ntpStatus=`statusd 'ntpd'`
+	fwallStatus=`statusd 'iptables'`
+	postfixStatus=`statusd 'postfix.service'`
 
 	if [[ $rootWarning -gt 0 ]]; then
 		bar "WARNING" 50
@@ -96,6 +99,9 @@ if [[ $USER = 'root' ]]; then
 		printStat "f2b" "$fail2banStatus"
 		printStat "sshgd" "$sshguardStatus"
 		printStat "cronie" "$cronieStatus"
+		printStat "ntp" "$ntpStatus"
+		printStat "iptables" "$fwallStatus"
+		printStat "postfix" "$postfixStatus"
 	bar 'Pending Tasks' 50
 		if [[ `wc -m < ~/.todo` -gt 1 ]]; then
 			while read line; do
